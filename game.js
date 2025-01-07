@@ -1,4 +1,3 @@
-const BPM = 120;  // Replace with your song's BPM if using for fallback timing
 const timingOffset = 1250;  // Adjust this value to control the initial obstacle delay
 
 const player = document.getElementById("player");
@@ -15,10 +14,17 @@ player.style.bottom = `${groundLevel}px`;
 let obstacleTimeouts = [];  // Stores timeouts for each obstacle
 let collisionInterval;
 
+let selectedCharacter = null;
+
+const characterSelectionScreen = document.getElementById("character-selection");
+const characterOptions = document.querySelectorAll(".character");
+const startGameButton = document.getElementById("start-game-button");
 
 
-// Define the rhythm pattern directly in JavaScript (milliseconds)
+
+// array of obstacle appearances in milliseconds
 const rhythmPattern = [2656, 4000, 5304]; 
+
 // Jump physics variables
 let isJumping = false;
 let jumpVelocity = 0;
@@ -29,11 +35,91 @@ const minJumpVelocity = 10 ;   // Minimum jump height threshold
 let obstaclesCleared = 0;
 
 
+// Display orientation warning
+function checkOrientation() {
+    const warning = document.getElementById("orientation-warning");
+    const gameContainer = document.getElementById("game-container");
+
+    if (window.innerWidth < window.innerHeight) {
+        // Portrait mode
+        warning.style.display = "flex";
+        gameContainer.style.display = "none";
+    } else {
+        // Landscape mode
+        warning.style.display = "none";
+        gameContainer.style.display = "block";
+    }
+}
+
+//request Fullscreen
+function requestFullscreenMode() {
+    const body = document.body; // Use the body element for fullscreen mode
+
+    if (body.requestFullscreen) {
+        body.requestFullscreen(); // Standard
+    } else if (body.webkitRequestFullscreen) {
+        body.webkitRequestFullscreen(); // Safari/Older Chrome
+    } else if (body.msRequestFullscreen) {
+        body.msRequestFullscreen(); // Older Microsoft Edge
+    }
+
+    // Scroll slightly to hide the URL bar (for mobile browsers)
+    setTimeout(() => window.scrollTo(0, 1), 100);
+}
+
+// Handle character selection
+characterOptions.forEach(option => {
+    option.addEventListener("click", () => {
+        // Remove selection from all characters
+        characterOptions.forEach(option => option.classList.remove("selected"));
+
+        // Add selection to the clicked character
+        option.classList.add("selected");
+
+        // Save the selected character
+        selectedCharacter = option.dataset.character;
+
+    if (selectedCharacter) {
+        console.log(`Selected Character: ${selectedCharacter}`);
+
+        // Hide the character selection screen
+        characterSelectionScreen.style.display = "none";
+
+        // Show the game container
+        gameContainer.style.display = "block";
+
+        // Pass the selected character to the game logic
+        startGameWithCharacter(selectedCharacter);
+    }
+	
+	
+    });
+});
+
+
+function startGameWithCharacter(character) {
+    requestFullscreenMode();
+	// Set the character sprite dynamically
+    const player = document.getElementById("player");
+    player.style.backgroundImage = `url('sprites/${character}.png')`;
+	player.style.visibility = "visible";
+	player.classList.add("walking");
+	player.style.animationPlayState = "running";
+	document.getElementById("game-container").classList.remove("paused");
+	const gameContainer = document.getElementById("game-container");
+    gameContainer.style.animationPlayState = "running";
+
+    // Start the game
+   // startGame();
+}
+
+
+
 // Function to start the game
 function startGame() {
-	document.getElementById("game-container").classList.remove("paused");
+    // Reset game variables and start the game logic
+    console.log("Game started!");
 	obstaclesCleared = 0;
-	console.log("obstaclesCleared reset");
 	console.log(obstaclesCleared);
     const bgMusic = document.getElementById("bg-music");
 	bgMusic.play();
@@ -164,16 +250,6 @@ function gameOver() {
     document.querySelectorAll(".obstacle").forEach(obstacle => obstacle.remove());
 }
 
-// Event listener for jumping using spacebar and mouse click
-document.addEventListener("keydown", (event) => {
-    if (event.code === "Space") {
-        jump();
-    }
-});
-
-gameContainer.addEventListener("click", () => {
-    jump();
-});
 
 // Stop upward momentum when releasing the jump key or mouse click, but only if the minimum height is reached
 function stopJumpIfMinimumHeight() {
@@ -182,7 +258,43 @@ function stopJumpIfMinimumHeight() {
     }
 }
 
+
+
+
+// -----EVENT LISTNENERS -------------------------------------------------------------
+
+
 bgMusic.addEventListener("ended", checkWinCondition);
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Ensure animations are paused initially
+    const gameContainer = document.getElementById("game-container");
+    gameContainer.style.animationPlayState = "paused";
+
+    const player = document.getElementById("player");
+	player.style.visibility = "hidden";
+
+    console.log("Game initialized in idle state.");
+});
+
+
+//orientation warning
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("load", checkOrientation);
+
+// Event listener for touch
+gameContainer.addEventListener("touchstart", (event) => {
+    // Prevent default behavior (like scrolling) if the touch is NOT on a button
+    if (!event.target.closest("button")) {
+        event.preventDefault();
+        jump(); // Trigger jump on touch anywhere in the game container
+    }
+});
+
+gameContainer.addEventListener("touchend", (event) => {
+    //event.preventDefault(); // Prevent default scrolling
+    stopJumpIfMinimumHeight(); // Stop upward momentum on touch release
+});
 
 
 // Event listener for spacebar
@@ -206,11 +318,18 @@ gameContainer.addEventListener("mousedown", () => {
 gameContainer.addEventListener("mouseup", () => {
     stopJumpIfMinimumHeight();
 });
-// Start button to initiate the game
-startButton.addEventListener("click", startGame);
 
-// Retry button to restart the game
-retryButton.addEventListener("click", startGame);
+// Start button to initiate the game
+startButton.addEventListener("click", (event) => {
+    event.stopPropagation(); // Prevent click from triggering a jump
+    startGame(); // Start the game
+});
+
+// Retry button to initiate the game
+retryButton.addEventListener("click", (event) => {
+    event.stopPropagation(); // Prevent click from triggering a jump
+    startGame(); // Restart the game
+});
 
 // Apply physics at regular intervals for smooth motion
 setInterval(applyPhysics, 20);  // Adjust for smoother physics simulation

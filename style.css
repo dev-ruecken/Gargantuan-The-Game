@@ -1,15 +1,85 @@
+img {
+    width: 100%; /* Scales to 100% of the parent container's width */
+    height: auto; /* Maintains the aspect ratio */
+    display: block; /* Removes any extra spacing around the image */
+}
+
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background-color: #f0f0f0;
+    margin: 0;
+    height: 100vh;         /* Fullscreen height */
+    overflow: hidden;      /* Prevent scrolling */
+    background-color: #000; /* Fullscreen background */
 }
 
+#orientation-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it sits above all other elements */
+}
+
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    color: white;
+}
+
+.character-options {
+    display: flex;
+    gap: 20px;
+}
+
+.character {
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.character img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.character:hover {
+    transform: scale(1.5);
+}
+
+.character.selected {
+    border-color: white;
+}
+
+
+
 #game-container {
+	display: none;
     position: relative;
     width: 530px;
     height: 400px;
+    margin: auto;
     border: 2px solid #000;
     background-color: #fff;
     overflow: hidden;
@@ -17,6 +87,7 @@ body {
     background-size: cover; /* Adjust as needed */
     background-repeat: repeat-x; /* Only repeat horizontally */
     animation: scrollBackground 5s linear infinite; /* Scroll effect */
+	animation-play-state: paused; /* Paused by default */
 }
 
 /* Keyframes for scrolling background */
@@ -42,7 +113,8 @@ body {
     height: 64px;     /* Match the frame height */
     background-image: url('sprites/Marni.png');
     background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
-    /*border: 1px solid red;*/ /* Temporary border for debugging */
+    background-position-x: -64px;
+	/*border: 1px solid red;*/ /* Temporary border for debugging */
 }
 
 
@@ -60,9 +132,25 @@ body {
     to { right: 850px; }
 }
 
+/* Stance animation (3 frames) */
+.stance {
+    animation: stance-animation 0.2s steps(1) infinite;  /* Adjust duration and frame count */
+	animation-play-state: running; /* Paused by default */
+}
+
+@keyframes stance-animation {
+    from {
+        background-position-x: -64px; /* Position of the desired frame */
+    }
+    to {
+        background-position-x: -64px; /* Same position to "freeze" */
+    }
+}
+
 /* Walking animation (3 frames) */
 .walking {
     animation: walk-animation 0.2s steps(1) infinite;  /* Adjust duration and frame count */
+	animation-play-state: paused; /* Paused by default */
 }
 
 @keyframes walk-animation {
@@ -100,6 +188,21 @@ button {
     font-size: 18px;
     cursor: pointer;
     z-index: 10;
+}
+
+
+#start-game-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+#start-game-button.enabled {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 #start-button {

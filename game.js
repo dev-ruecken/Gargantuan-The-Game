@@ -35,6 +35,7 @@ function initializeAudioContext() {
                 console.error("Error loading audio file:", error);
             }
         }
+		window.addEventListener('load', loadAudio);
 
 function playAudio() {
 	if (isPlaying) return;

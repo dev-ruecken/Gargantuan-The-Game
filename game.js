@@ -1,29 +1,103 @@
-const timingOffset = 1250;  // Adjust this value to control the initial obstacle delay
+const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 
 const player = document.getElementById("player");
 const groundLevel = parseFloat(getComputedStyle(player).bottom) || 64;
 const gameContainer = document.getElementById("game-container");
-const bgMusic = document.getElementById("bg-music");
+//const bgMusic = document.getElementById("bg-music");						//selecting song
 const startButton = document.getElementById("start-button");
 const retryButton = document.getElementById("retry-button");
 const gameOverMessage = document.getElementById("game-over-message");
+const characterSelectionScreen = document.getElementById("character-selection");
+const characterOptions = document.querySelectorAll(".character");
+const audioFilePath = 'audio/shortgarg.mp3'
+const audioFileInput = document.getElementById('audio-file');
+const progressBar = document.getElementById('progress-bar');
+const runtimeDisplay = document.getElementById('runtime');
+		
+let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
+
+
+function initializeAudioContext() {
+	audioContext = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+        async function loadAudio() {
+            try {
+                if (!audioContext) initializeAudioContext();
+                const response = await fetch(audioFilePath);
+                const arrayBuffer = await response.arrayBuffer();
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                console.log("Audio loaded successfully");
+                playButton.disabled = false;
+                pauseButton.disabled = false;
+                updateRuntime(0, audioBuffer.duration);
+            } catch (error) {
+                console.error("Error loading audio file:", error);
+            }
+        }
+
+function playAudio() {
+	if (isPlaying) return;
+
+    audioBufferSource = audioContext.createBufferSource();
+    audioBufferSource.buffer = audioBuffer;
+    audioBufferSource.connect(audioContext.destination);
+
+	const offset = pauseTime || 0;
+	audioBufferSource.start(0, offset);
+	startTime = audioContext.currentTime - offset;
+	isPlaying = true;
+
+	audioBufferSource.onended = () => {
+		isPlaying = false;
+		pauseTime = 0;
+		updateRuntime(audioBuffer.duration, audioBuffer.duration);
+	};
+	
+    requestAnimationFrame(updateProgress);
+	
+	scheduleObstacles(audioContext.currentTime);
+}
+
+
+function pauseAudio() {
+	if (!isPlaying) return;
+        audioBufferSource.stop();
+        pauseTime = audioContext.currentTime - startTime;
+        isPlaying = false;
+    }
+
+function updateRuntime(current, total) {
+    runtimeDisplay.textContent = `Current Time: ${current.toFixed(1)}s / Total Time: ${total.toFixed(1)}s`;
+}
+
+function updateProgress() {
+	if (isPlaying) {
+        const elapsed = audioContext.currentTime - startTime;
+        const total = audioBuffer.duration;
+        updateRuntime(elapsed, total);
+
+        const progressPercent = (elapsed / total) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+
+        if (elapsed < total) {
+             requestAnimationFrame(updateProgress);
+        }
+    }
+}
+
+
 
 
 player.style.bottom = `${groundLevel}px`;
 
 let obstacleTimeouts = [];  // Stores timeouts for each obstacle
 let collisionInterval;
-
+let obstaclesCleared = 0;
 let selectedCharacter = null;
 
-const characterSelectionScreen = document.getElementById("character-selection");
-const characterOptions = document.querySelectorAll(".character");
-const startGameButton = document.getElementById("start-game-button");
-
-
-
 // array of obstacle appearances in milliseconds
-const rhythmPattern = [2656, 4000, 5304]; 
+const rhythmPattern = [2588, 3274, 3961, 4625, 5281]; 
 
 // Jump physics variables
 let isJumping = false;
@@ -31,8 +105,6 @@ let jumpVelocity = 0;
 const gravity = 2.2;        // gravity (downward pull)
 const jumpStrength = 25;    // initial jump force
 const minJumpVelocity = 10 ;   // Minimum jump height threshold
-
-let obstaclesCleared = 0;
 
 
 // Display orientation warning
@@ -114,34 +186,48 @@ function startGameWithCharacter(character) {
 }
 
 
-
 // Function to start the game
 function startGame() {
     // Reset game variables and start the game logic
     console.log("Game started!");
+	playAudio();
 	obstaclesCleared = 0;
 	console.log(obstaclesCleared);
-    const bgMusic = document.getElementById("bg-music");
-	bgMusic.play();
+	//bgMusic.play();												//starting song
     gameOverMessage.style.display = "none";
     startButton.style.display = "none";
     retryButton.style.display = "none";
     // Listen for the end of the song to check win condition
-    bgMusic.addEventListener("ended", checkWinCondition);
+	
+	//bgMusic.addEventListener("ended", checkWinCondition);			//monitoring song end
+	
     // Start spawning obstacles based on rhythm pattern
-    rhythmPattern.forEach((delay) => {
-        const timeout = setTimeout(spawnObstacle, delay - timingOffset);
+   /* rhythmPattern.forEach((delay) => {
+        const timeout = setTimeout(spawnObstacle, delay - timeOffset);
         obstacleTimeouts.push(timeout);
-    });
+    });*/
 
     // Start collision checking at a regular interval
     collisionInterval = setInterval(checkCollision, 50);
 }
 
+// Schedule obstacles based on rhythm pattern
+function scheduleObstacles(startTime) {
+    rhythmPattern.forEach((timeOffset) => {
+        const spawnTime = startTime + timeOffset - timeCorrect;
+        const delay = (spawnTime - audioContext.currentTime); 
+
+        if (delay > 0) {
+            setTimeout(() => spawnObstacle(timeOffset), delay);
+        }
+    });
+}
+
+
+
 // Function to spawn a new obstacle
 function spawnObstacle() {
-		console.log("spawn obstacle enterred");
-		console.log(obstaclesCleared);
+	console.log(`Obstacle spawned at ${audioContext.currentTime}`);
     const obstacle = document.createElement("div");
     obstacle.classList.add("obstacle");
 
@@ -221,16 +307,16 @@ function checkCollision() {
 function checkWinCondition() {
     // If the song has ended and all obstacles are cleared, redirect to win page
      console.log("checkWinConditionEntered");
-	if (obstaclesCleared === rhythmPattern.length && bgMusic.ended) {
+	/*if (obstaclesCleared === rhythmPattern.length && bgMusic.ended) {				//check if bgMusic has ended
          console.log("WinCondition met");
 		window.location.href = "win.html";
-    }
+    }*/
 }
 
 // Function to handle game over
 function gameOver() {
-    bgMusic.pause();
-    bgMusic.currentTime = 0;  // Reset the song
+    //bgMusic.pause();																//pause music if game over
+    //bgMusic.currentTime = 0;  														//Reset the song for retry
     gameOverMessage.style.display = "block";
 
 	// Pause the background scrolling by adding the 'paused' class
@@ -264,7 +350,7 @@ function stopJumpIfMinimumHeight() {
 // -----EVENT LISTNENERS -------------------------------------------------------------
 
 
-bgMusic.addEventListener("ended", checkWinCondition);
+//bgMusic.addEventListener("ended", checkWinCondition);					//listens for the end of the song to check win cond.
 
 document.addEventListener("DOMContentLoaded", () => {
     // Ensure animations are paused initially

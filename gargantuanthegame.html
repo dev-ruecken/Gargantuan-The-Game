@@ -17,6 +17,7 @@
 	
 	
 	<div id="character-selection" class="overlay">
+	<input type="file" id="audio-file" accept="audio/mp3">
     <h1>Choose Your Prynnie</h1>
     <div class="character-options">
         <div class="character" data-character="Marni">
@@ -33,14 +34,21 @@
         </div>
     </div>
 	</div>
-	
+
 	
     <div id="game-container">
         <div id="player"></div>
         <button id="start-button">Start</button>
         <button id="retry-button" style="display: none;">Retry</button>
+		<div id="progress">
+			<div id="progress-bar"></div>
+		</div>
+    <center>
+	<p id="runtime">Current Time: 0s / Total Time: 0s</p>
+	</center>
     </div>
     
+
 	<div id="game-over-message" style="display: none;">Game Over my Dude :O</div>
 	
     <audio id="bg-music" src="audio/shortgarg.mp3"></audio>

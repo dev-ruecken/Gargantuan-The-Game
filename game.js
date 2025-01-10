@@ -17,11 +17,11 @@ const runtimeDisplay = document.getElementById('runtime');
 		
 let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-
+const audioFilePath = 'audio/garguthesong.mp3'; // Replace with your audio file path
 function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
-
+/*
 audioFileInput.addEventListener('change', async (event) => {
 	const file = event.target.files[0];
 	if (file) {
@@ -31,9 +31,14 @@ audioFileInput.addEventListener('change', async (event) => {
         updateRuntime(0, audioBuffer.duration);
     }
 });
+*/
+        
 
-/*
-async function loadAudio() {
+        function initializeAudioContext() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -47,8 +52,6 @@ async function loadAudio() {
                 console.error("Error loading audio file:", error);
             }
         }
-		window.addEventListener('load', loadAudio);
-*/
 
 function playAudio() {
 	if (isPlaying) return;

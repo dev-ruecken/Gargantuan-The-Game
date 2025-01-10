@@ -34,10 +34,6 @@ audioFileInput.addEventListener('change', async (event) => {
 */
         
 
-        function initializeAudioContext() {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
         async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();

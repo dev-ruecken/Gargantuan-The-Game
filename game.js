@@ -1,5 +1,4 @@
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
-const HitCorrect = 7;
 
 const player = document.getElementById("player");
 const groundLevel = parseFloat(getComputedStyle(player).bottom) || 64;
@@ -17,12 +16,12 @@ const runtimeDisplay = document.getElementById('runtime');
 		
 let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
+
 function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
-/*
-audioFileInput.addEventListener('change', async (event) => {
+
+/*audioFileInput.addEventListener('change', async (event) => {
 	const file = event.target.files[0];
 	if (file) {
 		const arrayBuffer = await file.arrayBuffer();
@@ -32,6 +31,7 @@ audioFileInput.addEventListener('change', async (event) => {
     }
 });
 */
+
 
 async function loadAudio() {
             try {

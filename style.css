@@ -90,7 +90,7 @@ body {
 #game-container {
 	display: none;
     position: relative;
-    width: 530px;
+    width: 600px;
     height: 400px;
     margin: auto;
     border: 2px solid #000;
@@ -124,7 +124,7 @@ body {
     left: 64px;
     width: 64px;      /* Match the frame width */
     height: 64px;     /* Match the frame height */
-    background-image: url('sprites/Marni.png');
+    background-image: url('sprites/Marni128.png');
     background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
     background-position-x: -64px;
 	/*border: 1px solid red;*/ /* Temporary border for debugging */

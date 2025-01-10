@@ -9,7 +9,7 @@ const retryButton = document.getElementById("retry-button");
 const gameOverMessage = document.getElementById("game-over-message");
 const characterSelectionScreen = document.getElementById("character-selection");
 const characterOptions = document.querySelectorAll(".character");
-const audioFilePath = 'audio/shortgarg.mp3'
+
 const audioFileInput = document.getElementById('audio-file');
 const progressBar = document.getElementById('progress-bar');
 const runtimeDisplay = document.getElementById('runtime');
@@ -21,7 +21,19 @@ function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-        async function loadAudio() {
+/*audioFileInput.addEventListener('change', async (event) => {
+	const file = event.target.files[0];
+	if (file) {
+		const arrayBuffer = await file.arrayBuffer();
+        if (!audioContext) initializeAudioContext();
+        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        updateRuntime(0, audioBuffer.duration);
+    }
+});
+*/
+
+
+async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -36,6 +48,7 @@ function initializeAudioContext() {
             }
         }
 		window.addEventListener('load', loadAudio);
+
 
 function playAudio() {
 	if (isPlaying) return;
@@ -103,9 +116,9 @@ const rhythmPattern = [2588, 3274, 3961, 4625, 5281];
 // Jump physics variables
 let isJumping = false;
 let jumpVelocity = 0;
-const gravity = 2.2;        // gravity (downward pull)
-const jumpStrength = 25;    // initial jump force
-const minJumpVelocity = 10 ;   // Minimum jump height threshold
+const gravity = 2.5;        // gravity (downward pull)
+const jumpStrength = 30;    // initial jump force
+const minJumpVelocity = 15 ;   // Minimum jump height threshold
 
 
 // Display orientation warning

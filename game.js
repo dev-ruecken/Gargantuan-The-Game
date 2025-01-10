@@ -21,7 +21,7 @@ function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-/*audioFileInput.addEventListener('change', async (event) => {
+audioFileInput.addEventListener('change', async (event) => {
 	const file = event.target.files[0];
 	if (file) {
 		const arrayBuffer = await file.arrayBuffer();
@@ -30,10 +30,9 @@ function initializeAudioContext() {
         updateRuntime(0, audioBuffer.duration);
     }
 });
-*/
 
 
-async function loadAudio() {
+/* async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -48,7 +47,7 @@ async function loadAudio() {
             }
         }
 		window.addEventListener('load', loadAudio);
-
+*/
 
 function playAudio() {
 	if (isPlaying) return;
@@ -272,6 +271,41 @@ function jump() {
 }
 
 // Apply physics to simulate jump and gravity
+
+let lastTime = performance.now();
+
+function applyPhysics() {
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+    lastTime = currentTime;
+
+    if (isJumping) {
+        let currentBottom = parseFloat(player.style.bottom) || 0;
+        player.style.bottom = `${currentBottom + jumpVelocity * deltaTime}px`;
+        jumpVelocity -= gravity * deltaTime; // Gravity decreases jump velocity over time
+
+        // Check if the player has landed
+        if (parseFloat(player.style.bottom) <= groundLevel) {
+            player.style.bottom = `${groundLevel}px`; // Set to ground level
+            isJumping = false;
+
+            // Trigger landing animation and switch to walking after landing
+            player.classList.remove("jumping");
+            player.classList.add("landing");
+            setTimeout(() => {
+                player.classList.remove("landing");
+                player.classList.add("walking");
+            }, 100); // Match with landing animation duration
+        }
+    }
+
+    // Continue applying physics on the next frame
+    requestAnimationFrame(applyPhysics);
+}
+
+requestAnimationFrame(applyPhysics);
+
+/*
 function applyPhysics() {
     if (isJumping) {
         let currentBottom = parseFloat(player.style.bottom) || 0;
@@ -298,6 +332,7 @@ function applyPhysics() {
         }
     }
 }
+*/
 
 // Collision Detection
 function checkCollision() {

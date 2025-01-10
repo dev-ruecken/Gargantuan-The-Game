@@ -21,7 +21,7 @@ let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPl
 function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
-
+/*
 audioFileInput.addEventListener('change', async (event) => {
 	const file = event.target.files[0];
 	if (file) {
@@ -31,9 +31,9 @@ audioFileInput.addEventListener('change', async (event) => {
         updateRuntime(0, audioBuffer.duration);
     }
 });
+*/
 
-
-/* async function loadAudio() {
+ async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -48,7 +48,7 @@ audioFileInput.addEventListener('change', async (event) => {
             }
         }
 		window.addEventListener('load', loadAudio);
-*/
+
 
 function playAudio() {
 	if (isPlaying) return;

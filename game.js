@@ -33,7 +33,7 @@ audioFileInput.addEventListener('change', async (event) => {
 });
 */
 
- async function loadAudio() {
+async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);

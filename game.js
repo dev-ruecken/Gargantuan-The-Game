@@ -17,7 +17,7 @@ const runtimeDisplay = document.getElementById('runtime');
 		
 let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-
+const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
 function initializeAudioContext() {
 	audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }

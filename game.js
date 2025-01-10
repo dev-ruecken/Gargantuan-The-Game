@@ -276,7 +276,7 @@ let lastTime = performance.now();
 
 function applyPhysics() {
     const currentTime = performance.now();
-    const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+    const deltaTime = (currentTime - lastTime) / 30; // Convert to seconds
     lastTime = currentTime;
 
     if (isJumping) {
@@ -466,5 +466,4 @@ retryButton.addEventListener("click", (event) => {
     startGame(); // Restart the game
 });
 
-// Apply physics at regular intervals for smooth motion
-setInterval(applyPhysics, 20);  // Adjust for smoother physics simulation
+

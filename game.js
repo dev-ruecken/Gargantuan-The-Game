@@ -32,8 +32,7 @@ audioFileInput.addEventListener('change', async (event) => {
     }
 });
 */
-        
-
+  
         async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
@@ -50,6 +49,7 @@ audioFileInput.addEventListener('change', async (event) => {
         }
 
 function playAudio() {
+	loadAudio();
 	if (isPlaying) return;
 
     audioBufferSource = audioContext.createBufferSource();

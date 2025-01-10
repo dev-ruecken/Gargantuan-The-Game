@@ -207,7 +207,6 @@ function startGame() {
 	playAudio();
 	obstaclesCleared = 0;
 	console.log(obstaclesCleared);
-	//bgMusic.play();												//starting song
     gameOverMessage.style.display = "none";
     startButton.style.display = "none";
     retryButton.style.display = "none";
@@ -244,7 +243,7 @@ function spawnObstacle() {
 	console.log(`Obstacle spawned at ${audioContext.currentTime}`);
     const obstacle = document.createElement("div");
     obstacle.classList.add("obstacle");
-
+	obstacle.style.animationPlayState = "running";
     // Place the obstacle at the right edge of the game container
     obstacle.style.right = "-50px";
     gameContainer.appendChild(obstacle);
@@ -373,10 +372,13 @@ function checkWinCondition() {
 
 // Function to handle game over
 function gameOver() {
-    //bgMusic.pause();																//pause music if game over
-    //bgMusic.currentTime = 0;  														//Reset the song for retry
+    pauseAudio();																//pause music if game over
+    pauseTime = 0;  														//Reset the song for retry
     gameOverMessage.style.display = "block";
-
+	gameContainer.style.animationPlayState = "paused";
+	player.style.animationPlayState = "paused";
+	player.classList.add("landing");
+	
 	// Pause the background scrolling by adding the 'paused' class
     document.getElementById("game-container").classList.add("paused");
 	
@@ -392,6 +394,7 @@ function gameOver() {
 
     // Remove all obstacles
     document.querySelectorAll(".obstacle").forEach(obstacle => obstacle.remove());
+	obstacle.style.visibility = "visible";
 }
 
 

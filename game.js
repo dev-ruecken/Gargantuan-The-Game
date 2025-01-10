@@ -47,9 +47,10 @@ audioFileInput.addEventListener('change', async (event) => {
                 console.error("Error loading audio file:", error);
             }
         }
-
+		loadAudio();
+		
 function playAudio() {
-	loadAudio();
+	
 	if (isPlaying) return;
 
     audioBufferSource = audioContext.createBufferSource();

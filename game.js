@@ -1,4 +1,5 @@
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
+const HitCorrect = 7;
 
 const player = document.getElementById("player");
 const groundLevel = parseFloat(getComputedStyle(player).bottom) || 64;
@@ -276,7 +277,7 @@ let lastTime = performance.now();
 
 function applyPhysics() {
     const currentTime = performance.now();
-    const deltaTime = (currentTime - lastTime) / 30; // Convert to seconds
+    const deltaTime = (currentTime - lastTime) / 28; // Convert to seconds
     lastTime = currentTime;
 
     if (isJumping) {
@@ -341,12 +342,20 @@ function checkCollision() {
         const obstacleRect = obstacle.getBoundingClientRect();
         const playerRect = player.getBoundingClientRect();
 
-        // Check for overlap between player and obstacle
+		// Shrink the player's hitbox
+        const playerHitbox = {
+            left: playerRect.left + HitCorrect,   // Add padding to the left
+            right: playerRect.right - HitCorrect, // Add padding to the right
+            top: playerRect.top + HitCorrect,    // Add padding to the top
+            bottom: playerRect.bottom - HitCorrect, // Add padding to the bottom
+        };
+
+        // Check for overlap between adjusted player hitbox and obstacle
         if (
-            playerRect.left < obstacleRect.left + obstacleRect.width &&
-            playerRect.left + playerRect.width > obstacleRect.left &&
-            playerRect.bottom > obstacleRect.top &&
-            playerRect.top < obstacleRect.bottom
+            playerHitbox.left < obstacleRect.right &&
+            playerHitbox.right > obstacleRect.left &&
+            playerHitbox.bottom > obstacleRect.top &&
+            playerHitbox.top < obstacleRect.bottom
         ) {
             gameOver();
         }

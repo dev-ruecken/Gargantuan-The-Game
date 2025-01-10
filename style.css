@@ -127,6 +127,7 @@ body {
     background-image: url('sprites/Marni.png');
     background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
     background-position-x: -64px;
+	animation-play-state: paused; /* Paused by default */
 	/*border: 1px solid red;*/ /* Temporary border for debugging */
 }
 
@@ -139,7 +140,8 @@ body {
 	background-image: url('sprites/mirrormani.png');
     background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
     background-position-x: -64px;
-     animation: walk-animation 0.2s steps(1) infinite, moveObstacle 3s linear;
+    animation: walk-animation 0.2s steps(1) infinite, moveObstacle 3s linear;
+	animation-play-state: paused; /* Paused by default */
 }
 
 @keyframes moveObstacle {

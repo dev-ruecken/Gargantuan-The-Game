@@ -96,10 +96,10 @@ body {
     border: 2px solid #000;
     background-color: #fff;
     overflow: hidden;
-    background-image: url('grafix/background.png'); /* Path to your background image */
+    background-image: url('grafix/venue_bg.png'); /* Path to your background image */
     background-size: cover; /* Adjust as needed */
     background-repeat: repeat-x; /* Only repeat horizontally */
-    animation: scrollBackground 5s linear infinite; /* Scroll effect */
+    animation: scrollBackground 7s linear infinite; /* Scroll effect */
 	animation-play-state: paused; /* Paused by default */
 }
 
@@ -109,7 +109,7 @@ body {
         background-position: 0 0;
     }
     to {
-        background-position: -1030px 0;
+        background-position: -1800px 0;
     }
 }
 
@@ -124,7 +124,7 @@ body {
     left: 64px;
     width: 64px;      /* Match the frame width */
     height: 64px;     /* Match the frame height */
-    background-image: url('sprites/Marni128.png');
+    background-image: url('sprites/Marni.png');
     background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
     background-position-x: -64px;
 	/*border: 1px solid red;*/ /* Temporary border for debugging */
@@ -134,10 +134,12 @@ body {
 .obstacle {
     position: absolute;
     bottom: 64px;
-    width: 20px;
-    height: 40px;
-    background-color: red;
-    animation: moveObstacle 3s linear forwards;
+    width: 64px;
+    height: 64px;
+	background-image: url('sprites/mirrormani.png');
+    background-size: 576px 64px;  /* Full width of sprite sheet for single row, height matches frame height */
+    background-position-x: -64px;
+     animation: walk-animation 0.2s steps(1) infinite, moveObstacle 3s linear;
 }
 
 @keyframes moveObstacle {

@@ -4,7 +4,6 @@ const HitCorrect = 7;
 const player = document.getElementById("player");
 const groundLevel = parseFloat(getComputedStyle(player).bottom) || 64;
 const gameContainer = document.getElementById("game-container");
-//const bgMusic = document.getElementById("bg-music");						//selecting song
 const startButton = document.getElementById("start-button");
 const retryButton = document.getElementById("retry-button");
 const gameOverMessage = document.getElementById("game-over-message");
@@ -14,26 +13,21 @@ const characterOptions = document.querySelectorAll(".character");
 const audioFileInput = document.getElementById('audio-file');
 const progressBar = document.getElementById('progress-bar');
 const runtimeDisplay = document.getElementById('runtime');
-		
-let audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
+        
+let gainNode, audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
 const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
+
+// Initialize AudioContext and GainNode
 function initializeAudioContext() {
-	audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    gainNode = audioContext.createGain(); // Create a GainNode for volume control
+    gainNode.gain.value = 0.4; // Default volume (0.0 = mute, 1.0 = full volume)
+    gainNode.connect(audioContext.destination); // Connect GainNode to the destination
 }
-/*
-audioFileInput.addEventListener('change', async (event) => {
-	const file = event.target.files[0];
-	if (file) {
-		const arrayBuffer = await file.arrayBuffer();
-        if (!audioContext) initializeAudioContext();
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        updateRuntime(0, audioBuffer.duration);
-    }
-});
-*/
-  
-        async function loadAudio() {
+
+// Load audio
+async function loadAudio() {
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -48,45 +42,59 @@ audioFileInput.addEventListener('change', async (event) => {
             }
         }
 		loadAudio();
-		
+
+// Play audio with GainNode for volume control
 function playAudio() {
-	
-	if (isPlaying) return;
+    if (isPlaying) return;
+
+    if (!audioBuffer) {
+        console.error("Audio buffer is not ready!");
+        return;
+    }
 
     audioBufferSource = audioContext.createBufferSource();
     audioBufferSource.buffer = audioBuffer;
-    audioBufferSource.connect(audioContext.destination);
 
-	const offset = pauseTime || 0;
-	audioBufferSource.start(0, offset);
-	startTime = audioContext.currentTime - offset;
-	isPlaying = true;
+    // Connect the audio source through the GainNode to the destination
+    audioBufferSource.connect(gainNode);
 
-	audioBufferSource.onended = () => {
-		isPlaying = false;
-		pauseTime = 0;
-		updateRuntime(audioBuffer.duration, audioBuffer.duration);
-	};
-	
+    const offset = pauseTime || 0;
+    audioBufferSource.start(0, offset);
+    startTime = audioContext.currentTime - offset;
+    isPlaying = true;
+
+    // Reset state when audio ends
+    audioBufferSource.onended = () => {
+        isPlaying = false;
+        pauseTime = 0;
+        updateRuntime(audioBuffer.duration, audioBuffer.duration);
+    };
+
     requestAnimationFrame(updateProgress);
-	
-	scheduleObstacles(audioContext.currentTime);
+    scheduleObstacles(audioContext.currentTime);
 }
 
+// Dynamically adjust volume
+function setVolume(value) {
+    if (gainNode) {
+        gainNode.gain.value = value;
+        console.log(`Volume set to: ${value}`);
+    }
+}
 
 function pauseAudio() {
-	if (!isPlaying) return;
-        audioBufferSource.stop();
-        pauseTime = audioContext.currentTime - startTime;
-        isPlaying = false;
-    }
+    if (!isPlaying) return;
+    audioBufferSource.stop();
+    pauseTime = audioContext.currentTime - startTime;
+    isPlaying = false;
+}
 
 function updateRuntime(current, total) {
     runtimeDisplay.textContent = `Current Time: ${current.toFixed(1)}s / Total Time: ${total.toFixed(1)}s`;
 }
 
 function updateProgress() {
-	if (isPlaying) {
+    if (isPlaying) {
         const elapsed = audioContext.currentTime - startTime;
         const total = audioBuffer.duration;
         updateRuntime(elapsed, total);
@@ -95,13 +103,14 @@ function updateProgress() {
         progressBar.style.width = `${progressPercent}%`;
 
         if (elapsed < total) {
-             requestAnimationFrame(updateProgress);
+            requestAnimationFrame(updateProgress);
+        }
+        if (elapsed > total) {
+            console.log("Win Condition met: Song ended!");
+            window.location.href = "win.html"; // Redirect to the win pag;
         }
     }
 }
-
-
-
 
 player.style.bottom = `${groundLevel}px`;
 
@@ -137,7 +146,7 @@ function checkOrientation() {
     }
 }
 
-//request Fullscreen
+// Request Fullscreen
 function requestFullscreenMode() {
     const body = document.body; // Use the body element for fullscreen mode
 
@@ -165,61 +174,59 @@ characterOptions.forEach(option => {
         // Save the selected character
         selectedCharacter = option.dataset.character;
 
-    if (selectedCharacter) {
-        console.log(`Selected Character: ${selectedCharacter}`);
+        if (selectedCharacter) {
+            console.log(`Selected Character: ${selectedCharacter}`);
 
-        // Hide the character selection screen
-        characterSelectionScreen.style.display = "none";
+            // Hide the character selection screen
+            characterSelectionScreen.style.display = "none";
 
-        // Show the game container
-        gameContainer.style.display = "block";
+            // Show the game container
+            gameContainer.style.display = "block";
 
-        // Pass the selected character to the game logic
-        startGameWithCharacter(selectedCharacter);
-    }
-	
-	
+            // Pass the selected character to the game logic
+            startGameWithCharacter(selectedCharacter);
+        }
     });
 });
 
-
 function startGameWithCharacter(character) {
     requestFullscreenMode();
-	// Set the character sprite dynamically
+    // Set the character sprite dynamically
     const player = document.getElementById("player");
     player.style.backgroundImage = `url('sprites/${character}.png')`;
-	player.style.visibility = "visible";
-	player.classList.add("walking");
-	player.style.animationPlayState = "running";
-	document.getElementById("game-container").classList.remove("paused");
-	const gameContainer = document.getElementById("game-container");
+    player.style.visibility = "visible";
+    player.classList.add("walking");
+    player.style.animationPlayState = "running";
+    document.getElementById("game-container").classList.remove("paused");
     gameContainer.style.animationPlayState = "running";
 
     // Start the game
-   // startGame();
+    startGame();
 }
 
+function restart() {
+    player.classList.add("walking");
+    player.style.animationPlayState = "running";
+    document.getElementById("game-container").classList.remove("paused");
+    const gameContainer = document.getElementById("game-container");
+    gameContainer.style.animationPlayState = "running";
+    startGame();
+}
 
 // Function to start the game
 function startGame() {
+    updateRuntime(0, audioBuffer.duration);
     // Reset game variables and start the game logic
     console.log("Game started!");
-	playAudio();
-	obstaclesCleared = 0;
-	console.log(obstaclesCleared);
+    player.classList.add("walking");
+    // Pause the background scrolling by adding the 'paused' class
+    document.getElementById("game-container").classList.add("paused");
+    playAudio();
+    obstaclesCleared = 0;
     gameOverMessage.style.display = "none";
     startButton.style.display = "none";
     retryButton.style.display = "none";
-    // Listen for the end of the song to check win condition
-	
-	//bgMusic.addEventListener("ended", checkWinCondition);			//monitoring song end
-	
-    // Start spawning obstacles based on rhythm pattern
-   /* rhythmPattern.forEach((delay) => {
-        const timeout = setTimeout(spawnObstacle, delay - timeOffset);
-        obstacleTimeouts.push(timeout);
-    });*/
-
+    
     // Start collision checking at a regular interval
     collisionInterval = setInterval(checkCollision, 50);
 }
@@ -231,31 +238,27 @@ function scheduleObstacles(startTime) {
         const delay = (spawnTime - audioContext.currentTime); 
 
         if (delay > 0) {
-            setTimeout(() => spawnObstacle(timeOffset), delay);
+            const timeout = setTimeout(() => spawnObstacle(timeOffset), delay);
+            obstacleTimeouts.push(timeout);
         }
     });
 }
 
-
-
 // Function to spawn a new obstacle
 function spawnObstacle() {
-	console.log(`Obstacle spawned at ${audioContext.currentTime}`);
+    console.log(`Obstacle spawned at ${audioContext.currentTime}`);
     const obstacle = document.createElement("div");
     obstacle.classList.add("obstacle");
-	obstacle.style.animationPlayState = "running";
+    obstacle.style.animationPlayState = "running";
     // Place the obstacle at the right edge of the game container
     obstacle.style.right = "-50px";
     gameContainer.appendChild(obstacle);
 
     // Remove the obstacle after animation ends to avoid clutter
     setTimeout(() => {
-		obstacle.remove();
-		console.log("obstacle removed");
-		console.log(obstaclesCleared);
-		obstaclesCleared = obstaclesCleared + 1;
-		console.log(obstaclesCleared);
-		checkWinCondition(); // Check win condition after each obstacle is cleared
+        obstacle.remove();
+        obstaclesCleared += 1;
+        checkWinCondition(); // Check win condition after each obstacle is cleared
     }, 3000);  // Match this with the CSS animation duration
 }
 
@@ -266,12 +269,10 @@ function jump() {
         jumpVelocity = jumpStrength;  // Set upward velocity
         player.classList.remove("walking");
         player.classList.add("jumping");  // Start jump animation
-            
-	}
+    }
 }
 
 // Apply physics to simulate jump and gravity
-
 let lastTime = performance.now();
 
 function applyPhysics() {
@@ -305,35 +306,6 @@ function applyPhysics() {
 
 requestAnimationFrame(applyPhysics);
 
-/*
-function applyPhysics() {
-    if (isJumping) {
-        let currentBottom = parseFloat(player.style.bottom) || 0;
-        player.style.bottom = `${currentBottom + jumpVelocity}px`;
-        jumpVelocity -= gravity;  // Gravity reduces the jump velocity over time
-
-        // Check if the player has landed
-        if (parseFloat(player.style.bottom) <= groundLevel) {
-            player.style.bottom = `${groundLevel}px`;  // Set to ground level
-            isJumping = false;
-
-            // Trigger landing animation and switch to walking after landing
-            player.classList.remove("jumping");
-            player.classList.add("landing");
-            setTimeout(() => {
-                player.classList.remove("landing");
-                player.classList.add("walking");
-            }, 100);  // Match with landing animation duration
-        }
-    } else {
-        // Apply walking animation if on the ground and not jumping
-        if (!player.classList.contains("walking")) {
-            player.classList.add("walking");
-        }
-    }
-}
-*/
-
 // Collision Detection
 function checkCollision() {
     const obstacles = document.querySelectorAll(".obstacle");
@@ -341,7 +313,7 @@ function checkCollision() {
         const obstacleRect = obstacle.getBoundingClientRect();
         const playerRect = player.getBoundingClientRect();
 
-		// Shrink the player's hitbox
+        // Shrink the player's hitbox
         const playerHitbox = {
             left: playerRect.left + HitCorrect,   // Add padding to the left
             right: playerRect.right - HitCorrect, // Add padding to the right
@@ -363,39 +335,46 @@ function checkCollision() {
 
 function checkWinCondition() {
     // If the song has ended and all obstacles are cleared, redirect to win page
-     console.log("checkWinConditionEntered");
-	/*if (obstaclesCleared === rhythmPattern.length && bgMusic.ended) {				//check if bgMusic has ended
-         console.log("WinCondition met");
-		window.location.href = "win.html";
+    /*if (audioBuffer && !isPlaying && audioContext.currentTime >= audioBuffer.duration) {
+    console.log("Win Condition met: Song ended!");
+    window.location.href = "win.html"; // Redirect to the win page
+    }*/
+
+    /*if (obstaclesCleared === rhythmPattern.length) {
+        console.log("WinCondition met");
+        window.location.href = "win.html";
     }*/
 }
 
 // Function to handle game over
 function gameOver() {
-    pauseAudio();																//pause music if game over
-    pauseTime = 0;  														//Reset the song for retry
+    pauseAudio();  // Pause music if game over
+    pauseTime = 0;  // Reset the song for retry
     gameOverMessage.style.display = "block";
-	gameContainer.style.animationPlayState = "paused";
-	player.style.animationPlayState = "paused";
-	player.classList.add("landing");
-	
-	// Pause the background scrolling by adding the 'paused' class
+    gameContainer.style.animationPlayState = "paused";
+    player.style.animationPlayState = "paused";
+    player.classList.add("landing");
+
+    // Pause the background scrolling by adding the 'paused' class
     document.getElementById("game-container").classList.add("paused");
-	
+
     // Clear all obstacle timeouts
     obstacleTimeouts.forEach(timeout => clearTimeout(timeout));
-    obstacleTimeouts = [];
+    obstacleTimeouts = [];  // Empty the array to prevent future use
 
     // Stop collision checking
-    clearInterval(collisionInterval);
+    if (collisionInterval) {
+        clearInterval(collisionInterval);
+        collisionInterval = null;  // Reset the interval variable to avoid duplicates
+    }
 
     // Show the Retry button
     retryButton.style.display = "block";
 
     // Remove all obstacles
     document.querySelectorAll(".obstacle").forEach(obstacle => obstacle.remove());
-	obstacle.style.visibility = "visible";
 }
+
 
 
 // Stop upward momentum when releasing the jump key or mouse click, but only if the minimum height is reached
@@ -475,7 +454,7 @@ startButton.addEventListener("click", (event) => {
 // Retry button to initiate the game
 retryButton.addEventListener("click", (event) => {
     event.stopPropagation(); // Prevent click from triggering a jump
-    startGame(); // Restart the game
+    restart(); // Restart the game
 });
 
 

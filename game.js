@@ -26,17 +26,20 @@ function initializeAudioContext() {
     gainNode.connect(audioContext.destination); // Connect GainNode to the destination
 }
 
- audioFileInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const arrayBuffer = await file.arrayBuffer();
+  async function loadAudio() {
+            try {
                 if (!audioContext) initializeAudioContext();
+                const response = await fetch(audioFilePath);
+                const arrayBuffer = await response.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                console.log("Audio loaded successfully");
                 playButton.disabled = false;
                 pauseButton.disabled = false;
                 updateRuntime(0, audioBuffer.duration);
+            } catch (error) {
+                console.error("Error loading audio file:", error);
             }
-        });
+        }
 
 // Play audio with GainNode for volume control
 function playAudio() {

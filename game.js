@@ -36,7 +36,6 @@ function initializeAudioContext() {
                 const arrayBuffer = await response.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                 console.log("Audio loaded successfully");
-                playButton.disabled = false;
                 pauseButton.disabled = false;
                 updateRuntime(0, audioBuffer.duration);
             } catch (error) {

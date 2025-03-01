@@ -26,22 +26,17 @@ function initializeAudioContext() {
     gainNode.connect(audioContext.destination); // Connect GainNode to the destination
 }
 
-// Load audio
-async function loadAudio() {
-            try {
+ audioFileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const arrayBuffer = await file.arrayBuffer();
                 if (!audioContext) initializeAudioContext();
-                const response = await fetch(audioFilePath);
-                const arrayBuffer = await response.arrayBuffer();
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                console.log("Audio loaded successfully");
                 playButton.disabled = false;
                 pauseButton.disabled = false;
                 updateRuntime(0, audioBuffer.duration);
-            } catch (error) {
-                console.error("Error loading audio file:", error);
             }
-        }
-		loadAudio();
+        });
 
 // Play audio with GainNode for volume control
 function playAudio() {
@@ -105,9 +100,9 @@ function updateProgress() {
         if (elapsed < total) {
             requestAnimationFrame(updateProgress);
         }
-        if (elapsed > total) {
-            console.log("Win Condition met: Song ended!");
-            window.location.href = "win.html"; // Redirect to the win pag;
+        //console.log(elapsed);
+        if (elapsed >= total-0.5) {
+            gameWon();
         }
     }
 }
@@ -121,6 +116,7 @@ let selectedCharacter = null;
 
 // array of obstacle appearances in milliseconds
 const rhythmPattern = [2588, 3274, 3961, 4625, 5281]; 
+//const rhythmPattern = [4242, 6962, 9634, 12313, 14570, 15426, 16746, 18067, 19418, 20762, 22138, 23474, 24826, 26219, 28547, 31218, 33890, 36147, 36954, 37643, 39699, 41026, 42395, 43076, 45083, 46435, 47763, 48435, 50452, 51795, 53147, 53811, 55483, 56923, 58195, 60931, 63604, 66284, 69013, 69724, 70339, 71740, 72412, 73060, 74444, 75788, 77124, 79805, 81124, 82452, 83796, 85140, 86500, 87836, 89236, 91949, 92605, 93276, 94596, 95965, 97292, 98660, 99956, 101733, 102421, 103117, 104445, 105789, 107133, 107796, 108461, 109805, 111149, 112525, 113197, 113861, 115213, 116541, 117901, 118613, 119277, 120637, 121974, 125686, 126997, 128302, 130814, 132133, 133501, 136221, 138917, 141597, 142934, 144295, 147014, 149662, 152398, 153751, 155046, 160999, 166374, 167767, 169102, 170447, 171303, 174456, 175815, 177191, 178568, 179831, 182551, 183992, 190367, 191735, 193055, 194407, 195752, 197079, 198440, 201151, 201856, 202512, 203864, 204536, 205208, 206521, 207184, 207856, 209200, 210560, 212240, 212864, 213552, 214928, 215624, 216272, 217632, 218296, 218992, 220344, 221320, 222016, 222672, 224000, 225368, 226721, 228089, 229328, 229457, 230665, 230817, 232032, 232193, 234241, 235601, 236761, 236912, 238145, 238289, 239432, 239592, 240801, 240969, 241665, 243009, 244113, 244265];
 
 // Jump physics variables
 let isJumping = false;
@@ -148,6 +144,8 @@ function checkOrientation() {
 
 // Request Fullscreen
 function requestFullscreenMode() {
+    anticheat = false;
+    console.log(anticheat)
     const body = document.body; // Use the body element for fullscreen mode
 
     if (body.requestFullscreen) {
@@ -201,7 +199,7 @@ function startGameWithCharacter(character) {
     gameContainer.style.animationPlayState = "running";
 
     // Start the game
-    startGame();
+    //startGame();
 }
 
 function restart() {
@@ -215,6 +213,7 @@ function restart() {
 
 // Function to start the game
 function startGame() {
+    anticheat = true;
     updateRuntime(0, audioBuffer.duration);
     // Reset game variables and start the game logic
     console.log("Game started!");
@@ -346,6 +345,40 @@ function checkWinCondition() {
     }*/
 }
 
+
+// Function to handle game over
+function gameWon() {
+    console.log("Win Condition met: Song ended!");
+
+    pauseAudio();  // Pause music if game over
+    pauseTime = 0;  // Reset the song for retry
+
+    gameContainer.style.animationPlayState = "paused";
+    player.style.animationPlayState = "paused";
+    player.classList.add("landing");
+
+    // Pause the background scrolling by adding the 'paused' class
+    document.getElementById("game-container").classList.add("paused");
+
+    // Clear all obstacle timeouts
+    obstacleTimeouts.forEach(timeout => clearTimeout(timeout));
+    obstacleTimeouts = [];  // Empty the array to prevent future use
+
+    // Stop collision checking
+    if (collisionInterval) {
+        clearInterval(collisionInterval);
+        collisionInterval = null;  // Reset the interval variable to avoid duplicates
+    }
+
+    // Show the Retry button
+    retryButton.style.display = "block";
+
+    // Remove all obstacles
+    document.querySelectorAll(".obstacle").forEach(obstacle => obstacle.remove());
+    
+    window.location.href = "win.html"; // Redirect to the win pag;
+}
+
 // Function to handle game over
 function gameOver() {
     pauseAudio();  // Pause music if game over
@@ -391,6 +424,20 @@ function stopJumpIfMinimumHeight() {
 
 
 //bgMusic.addEventListener("ended", checkWinCondition);					//listens for the end of the song to check win cond.
+
+let anticheat = false;
+
+document.addEventListener("visibilitychange", () => {
+    if (anticheat) {
+        gameOver();
+    }
+});
+
+window.addEventListener("blur", () => {
+    if (anticheat) {
+        gameOver();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     // Ensure animations are paused initially

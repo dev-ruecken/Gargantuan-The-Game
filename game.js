@@ -1,3 +1,5 @@
+console.log("debug 1.0");
+
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 const HitCorrect = 7;
 
@@ -27,6 +29,7 @@ function initializeAudioContext() {
 }
 
   async function loadAudio() {
+            console.log("loadAudio entered");
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);

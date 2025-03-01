@@ -1,4 +1,4 @@
-console.log("debug 1.1");
+console.log("debug 1.2");
 
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 const HitCorrect = 7;

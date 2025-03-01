@@ -41,6 +41,9 @@ function initializeAudioContext() {
             }
         }
 
+window.addEventListener('load', loadAudio);
+
+
 // Play audio with GainNode for volume control
 function playAudio() {
     if (isPlaying) return;

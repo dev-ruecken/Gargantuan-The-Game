@@ -1,4 +1,4 @@
-console.log("debug 2.0")
+console.log("debug 2.1")
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 const HitCorrect = 10;
 
@@ -17,7 +17,7 @@ const runtimeDisplay = document.getElementById('runtime');
         
 let gainNode, audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
+const audioFilePath = 'audio/GargantuanTheSongTheGame.mp3'; // Replace with your audio file path
 
 // Initialize AudioContext and GainNode
 function initializeAudioContext() {
@@ -91,7 +91,7 @@ function pauseAudio() {
 
 function updateRuntime(current, total) {
     //runtimeDisplay.textContent = `Current Time: ${current.toFixed(1)}s / Total Time: ${total.toFixed(1)}s`;
-    runtimeDisplay.textContent = `${current.toFixed(1)*10} of ${total.toFixed(1)*10}km TO STAGE`;
+    runtimeDisplay.textContent = `${current.toFixed(1)*10} of ${total.toFixed(1)*10}m TO STAGE`;
 }
 
 function updateProgress() {

@@ -1,4 +1,4 @@
-console.log("debug 2.1")
+console.log("debug 3.0")
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 const HitCorrect = 10;
 
@@ -147,6 +147,14 @@ function checkOrientation() {
         gameContainer.style.display = "block";
     }
 }
+
+function checkForPortrait() {
+    if (screen.orientation.type.startsWith("portrait")) {
+        gameOver();
+    }
+}
+screen.orientation.addEventListener("change", checkForPortrait);
+
 
 // Request Fullscreen
 function requestFullscreenMode() {

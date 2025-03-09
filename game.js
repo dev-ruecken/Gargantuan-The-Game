@@ -1,4 +1,4 @@
-console.log("debug 3.0")
+console.log("debug 1.0 - loading message")
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
 const HitCorrect = 10;
 
@@ -27,8 +27,25 @@ function initializeAudioContext() {
     gainNode.connect(audioContext.destination); // Connect GainNode to the destination
 }
 
+document.getElementById('loadingMessage').style.display = 'block';
+/*
+ // Load audio from file input
+audioFileInput.addEventListener('change', async (event) => {
+    document.getElementById('loadingMessage').style.display = 'block';
+    const file = event.target.files[0];
+    if (file) {
+        const arrayBuffer = await file.arrayBuffer();
+        if (!audioContext) initializeAudioContext();
+        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        updateRuntime(0, audioBuffer.duration);
+        document.getElementById('loadingMessage').style.display = 'none';
+    }
+});
+*/
+
   async function loadAudio() {
             console.log("loadAudio entered");
+            document.getElementById('loadingMessage').style.display = 'block';
             try {
                 if (!audioContext) initializeAudioContext();
                 const response = await fetch(audioFilePath);
@@ -36,12 +53,16 @@ function initializeAudioContext() {
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                 console.log("Audio loaded successfully");
                 updateRuntime(0, audioBuffer.duration);
+                document.getElementById('loadingMessage').style.display = 'none';
             } catch (error) {
                 console.error("Error loading audio file:", error);
             }
         }
 
 window.addEventListener('load', loadAudio);
+
+
+// Play audio with GainNode for volume control
 
 // Play audio with GainNode for volume control
 function playAudio() {

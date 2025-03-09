@@ -1,6 +1,6 @@
 console.log("debug 1.0 - loading message")
 const timeCorrect = 1460;  // Adjust this value to control the initial obstacle delay
-const HitCorrect = 10;
+const HitCorrect = 20;
 
 const player = document.getElementById("player");
 const groundLevel = parseFloat(getComputedStyle(player).bottom) || 64;
@@ -28,7 +28,6 @@ function initializeAudioContext() {
 }
 
 document.getElementById('loadingMessage').style.display = 'block';
-/*
  // Load audio from file input
 audioFileInput.addEventListener('change', async (event) => {
     document.getElementById('loadingMessage').style.display = 'block';
@@ -41,8 +40,8 @@ audioFileInput.addEventListener('change', async (event) => {
         document.getElementById('loadingMessage').style.display = 'none';
     }
 });
-*/
 
+/*
   async function loadAudio() {
             console.log("loadAudio entered");
             document.getElementById('loadingMessage').style.display = 'block';
@@ -53,7 +52,6 @@ audioFileInput.addEventListener('change', async (event) => {
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                 console.log("Audio loaded successfully");
                 updateRuntime(0, audioBuffer.duration);
-                document.getElementById('loadingMessage').style.display = 'none';
             } catch (error) {
                 console.error("Error loading audio file:", error);
             }
@@ -61,6 +59,7 @@ audioFileInput.addEventListener('change', async (event) => {
 
 window.addEventListener('load', loadAudio);
 
+*/
 
 // Play audio with GainNode for volume control
 

@@ -54,6 +54,7 @@ audioFileInput.addEventListener('change', async (event) => {
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                 console.log("Audio loaded successfully");
                 updateRuntime(0, audioBuffer.duration);
+                document.getElementById('loadingMessage').style.display = 'none';
             } catch (error) {
                 console.error("Error loading audio file:", error);
             }

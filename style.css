@@ -8,6 +8,11 @@ p{
     padding:0;
 }
 
+h5{
+    margin:0;
+    padding:1; 
+}
+
 img {
     width: 100%; /* Scales to 100% of the parent container's width */
     height: auto; /* Maintains the aspect ratio */

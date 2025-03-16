@@ -28,10 +28,7 @@ function initializeAudioContext() {
 }
 
 document.getElementById('loadingMessage').style.display = 'block';
-
-/*
-// Load audio from file input
-
+ // Load audio from file input
 audioFileInput.addEventListener('change', async (event) => {
     document.getElementById('loadingMessage').style.display = 'block';
     const file = event.target.files[0];
@@ -43,8 +40,8 @@ audioFileInput.addEventListener('change', async (event) => {
         document.getElementById('loadingMessage').style.display = 'none';
     }
 });
-*/
 
+/*
   async function loadAudio() {
             console.log("loadAudio entered");
             document.getElementById('loadingMessage').style.display = 'block';
@@ -55,7 +52,6 @@ audioFileInput.addEventListener('change', async (event) => {
                 audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
                 console.log("Audio loaded successfully");
                 updateRuntime(0, audioBuffer.duration);
-		document.getElementById('loadingMessage').style.display = 'none';
             } catch (error) {
                 console.error("Error loading audio file:", error);
             }
@@ -63,6 +59,7 @@ audioFileInput.addEventListener('change', async (event) => {
 
 window.addEventListener('load', loadAudio);
 
+*/
 
 // Play audio with GainNode for volume control
 

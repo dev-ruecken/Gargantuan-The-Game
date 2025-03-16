@@ -3,6 +3,11 @@ body {
     font-family: 'Press Start 2P', sans-serif;
 }
 
+p{
+    margin:0;
+    padding:0;
+}
+
 img {
     width: 100%; /* Scales to 100% of the parent container's width */
     height: auto; /* Maintains the aspect ratio */
@@ -56,7 +61,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 1);
     display: flex;
     flex-direction: column;
     justify-content: center;

@@ -17,7 +17,7 @@ const runtimeDisplay = document.getElementById('runtime');
         
 let gainNode, audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-const audioFilePath = 'audio/GargantuanTheSongTheGame.mp3'; // Replace with your audio file path
+const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
 
 // Initialize AudioContext and GainNode
 function initializeAudioContext() {

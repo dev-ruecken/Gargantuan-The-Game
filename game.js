@@ -17,7 +17,7 @@ const runtimeDisplay = document.getElementById('runtime');
         
 let gainNode, audioContext, audioBufferSource, audioBuffer, startTime, pauseTime = 0, isPlaying = false;
 
-const audioFilePath = 'audio/shortgarg.mp3'; // Replace with your audio file path
+const audioFilePath = 'audio/GargantuanTheSongTheGame.mp3'; // Replace with your audio file path
 
 // Initialize AudioContext and GainNode
 function initializeAudioContext() {
@@ -28,8 +28,6 @@ function initializeAudioContext() {
 }
 
 document.getElementById('loadingMessage').style.display = 'block';
- 
-/*
  // Load audio from file input
 audioFileInput.addEventListener('change', async (event) => {
     document.getElementById('loadingMessage').style.display = 'block';
@@ -42,8 +40,8 @@ audioFileInput.addEventListener('change', async (event) => {
         document.getElementById('loadingMessage').style.display = 'none';
     }
 });
-*/
 
+/*
   async function loadAudio() {
             console.log("loadAudio entered");
             document.getElementById('loadingMessage').style.display = 'block';
@@ -62,7 +60,7 @@ audioFileInput.addEventListener('change', async (event) => {
 
 window.addEventListener('load', loadAudio);
 
-
+*/
 
 // Play audio with GainNode for volume control
 
